@@ -59,7 +59,7 @@ public class TelegramListBot extends TelegramLongPollingBot
             if(!chats.containsKey(chatId))
             {
                 chats.put(chatId, new Chat(chatId, this));
-                writeLog("New chat: "+chatId);
+                writeLog("New chat: "+chatId+"\tusername: "+update.getMessage().getChat().getUserName());
             }
             chats.get(chatId).onUpdate(update);
         }
