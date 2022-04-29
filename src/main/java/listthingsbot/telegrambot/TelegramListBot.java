@@ -1,7 +1,10 @@
 package listthingsbot.telegrambot;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -50,6 +53,7 @@ public class TelegramListBot extends TelegramLongPollingBot
         if(update.hasMessage() || update.hasCallbackQuery())
         {
             String chatId;
+
 
             if(update.hasMessage())
                 chatId=update.getMessage().getChatId().toString();

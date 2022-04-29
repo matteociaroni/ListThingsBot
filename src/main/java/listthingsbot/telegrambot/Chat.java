@@ -1,11 +1,13 @@
 package listthingsbot.telegrambot;
 
 import listthingsbot.listmodel.User;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -134,87 +136,90 @@ public class Chat
      */
     public void elaborate(Message message)
     {
-        /* Messages containing TELEGRAM COMMANDS */
-
-        if(message.isCommand())
+        /* When the user sends the "lists" command */
+        if(message.isCommand() && message.getText().startsWith("/lists"))
         {
-            /* When the user sends the "lists" command */
-            if(message.getText().startsWith("/lists"))
-            {
-                if(listUser.countLists()>0)
-                {
-                    SendMessage sendMessage=new SendMessage();
-                    sendMessage.setReplyMarkup(getButtonsWithListTitles("show_"));
-                    sendMessage.setText("Select a list to show");
-                    sendMessage(sendMessage);
-                }
-                else
-                    sendMessage("Nothing to show \uD83D\uDE41\nCreate a new list with /newlist");
-            }
-
-            /* When the user sends the "new list" command */
-            else if(message.getText().startsWith("/newlist"))
-            {
-                status=ChatStatus.ADD_LIST;
-                sendMessage("Type the <b>name</b> of the new list");
-            }
-            /* When the user sends the "cancel" command */
-            else if(message.getText().startsWith("/cancel"))
-            {
-                status=ChatStatus.DEFAULT;
-                sendMessage("Previous actions ignored");
-            }
-            /* When the user sends the "help" command */
-            else if(message.getText().startsWith("/help"))
-            {
-                status=ChatStatus.DEFAULT;
-                StringBuilder helpMessage=new StringBuilder();
-                helpMessage.append("This bot can help you manage multiple lists of things.\n");
-                helpMessage.append("Use the /lists command to show all lists and to manage them.\n");
-                helpMessage.append("Use the /newlist command to create a new list.\n");
-                helpMessage.append("Use the /cancel command to ignore previous actions.\n");
-                helpMessage.append("Use the /help command to show this message.\n");
-                sendMessage(helpMessage.toString());
-            }
-        }
-
-        /* Messages with no Telegram commands: instructions are based on the chat status */
-
-        /* When the user sends a message with the title of a new list */
-        else if(status==ChatStatus.ADD_LIST)
-        {
-            addList(message.getText().trim());
-            status=ChatStatus.DEFAULT;
-        }
-
-        /* When the user sends a message with the new title of a list to rename */
-        else if(status==ChatStatus.RENAME_LIST)
-        {
-            renameList(lastListTitle, message.getText().trim());
-            status=ChatStatus.DEFAULT;
-        }
-
-        /* When the user sends a message with a new item to add to a list */
-        else if(status==ChatStatus.ADD_ITEM)
-        {
-            addItems(lastListTitle, message.getText().trim().split("\n"));
-            status=ChatStatus.DEFAULT;
-        }
-
-        /* When the user sends a message with a new item to remove from a list */
-        else if(status==ChatStatus.DELETE_ITEM)
-        {
-            try
-            {
-                removeItem(lastListTitle, Integer.parseInt(message.getText()));
-            }
-            catch(NumberFormatException e)
+            if(listUser.countLists()>0)
             {
                 SendMessage sendMessage=new SendMessage();
-                sendMessage.setText("⚠️ Not a valid number");
+                sendMessage.setReplyMarkup(getButtonsWithListTitles("show_"));
+                sendMessage.setText("Select a list to show");
                 sendMessage(sendMessage);
             }
-            status=ChatStatus.DEFAULT;
+            else
+                sendMessage("Nothing to show \uD83D\uDE41\nCreate a new list with /newlist");
+        }
+
+        /* Check if user is admin in a group or if it's a private chat */
+        else if(!message.isGroupMessage() || isUserAdmin(message.getFrom().getId()))
+        {
+            /* Messages containing TELEGRAM COMMANDS */
+            if(message.isCommand())
+            {
+                /* When the user sends the "new list" command */
+                if(message.getText().startsWith("/newlist"))
+                {
+                    status=ChatStatus.ADD_LIST;
+                    sendMessage("Type the <b>name</b> of the new list");
+                }
+                /* When the user sends the "cancel" command */
+                else if(message.getText().startsWith("/cancel"))
+                {
+                    status=ChatStatus.DEFAULT;
+                    sendMessage("Previous actions ignored");
+                }
+                /* When the user sends the "help" command */
+                else if(message.getText().startsWith("/help"))
+                {
+                    status=ChatStatus.DEFAULT;
+                    StringBuilder helpMessage=new StringBuilder();
+                    helpMessage.append("This bot can help you manage multiple lists of things.\n");
+                    helpMessage.append("Use the /lists command to show all lists and to manage them.\n");
+                    helpMessage.append("Use the /newlist command to create a new list.\n");
+                    helpMessage.append("Use the /cancel command to ignore previous actions.\n");
+                    helpMessage.append("Use the /help command to show this message.\n");
+                    sendMessage(helpMessage.toString());
+                }
+            }
+
+            /* Messages with no Telegram commands: instructions are based on the chat status */
+
+            /* When the user sends a message with the title of a new list */
+            else if(status==ChatStatus.ADD_LIST)
+            {
+                addList(message.getText().trim());
+                status=ChatStatus.DEFAULT;
+            }
+
+            /* When the user sends a message with the new title of a list to rename */
+            else if(status==ChatStatus.RENAME_LIST)
+            {
+                renameList(lastListTitle, message.getText().trim());
+                status=ChatStatus.DEFAULT;
+            }
+
+            /* When the user sends a message with a new item to add to a list */
+            else if(status==ChatStatus.ADD_ITEM)
+            {
+                addItems(lastListTitle, message.getText().trim().split("\n"));
+                status=ChatStatus.DEFAULT;
+            }
+
+            /* When the user sends a message with a new item to remove from a list */
+            else if(status==ChatStatus.DELETE_ITEM)
+            {
+                try
+                {
+                    removeItem(lastListTitle, Integer.parseInt(message.getText()));
+                }
+                catch(NumberFormatException e)
+                {
+                    SendMessage sendMessage=new SendMessage();
+                    sendMessage.setText("⚠️ Not a valid number");
+                    sendMessage(sendMessage);
+                }
+                status=ChatStatus.DEFAULT;
+            }
         }
     }
 
@@ -248,56 +253,84 @@ public class Chat
             editMessage(message);
         }
 
-        /* When user pressed "delete" button */
-        if(callbackQuery.getData().startsWith("delete_"))
+        /* Check if user is admin in a group or if it's a private chat */
+        if(!callbackQuery.getMessage().isGroupMessage() || isUserAdmin(callbackQuery.getFrom().getId()))
         {
-            lastListTitle=callbackQuery.getData().replaceFirst("delete_", "");
-
-            if(listUser.getList(lastListTitle)!=null)
+            /* When user pressed "delete" button */
+            if(callbackQuery.getData().startsWith("delete_"))
             {
-                listUser.removeList(lastListTitle);
-                EditMessageText message=new EditMessageText();
-                message.setMessageId(callbackQuery.getMessage().getMessageId());
-                message.setText("\uD83D\uDDD1️ List <b>"+lastListTitle+"</b> deleted");
-                editMessage(message);
+                lastListTitle=callbackQuery.getData().replaceFirst("delete_", "");
+
+                if(listUser.getList(lastListTitle)!=null)
+                {
+                    listUser.removeList(lastListTitle);
+                    EditMessageText message=new EditMessageText();
+                    message.setMessageId(callbackQuery.getMessage().getMessageId());
+                    message.setText("\uD83D\uDDD1️ List <b>"+lastListTitle+"</b> deleted");
+                    editMessage(message);
+                }
+            }
+
+            /* When user pressed "rename" button */
+            if(callbackQuery.getData().startsWith("rename_"))
+            {
+                lastListTitle=callbackQuery.getData().replaceFirst("rename_", "");
+
+                if(listUser.getList(lastListTitle)!=null)
+                {
+                    status=ChatStatus.RENAME_LIST;
+                    sendMessage("✏️ Enter a new name for <b>"+lastListTitle+"</b>");
+                }
+            }
+
+            /* When user presses "Add item" button */
+            if(callbackQuery.getData().startsWith("additems_"))
+            {
+                lastListTitle=callbackQuery.getData().replaceFirst("additems_", "");
+
+                if(listUser.getList(lastListTitle)!=null)
+                {
+                    status=ChatStatus.ADD_ITEM;
+                    sendMessage("Type the items you want to add to <b>"+lastListTitle+"</b>");
+                }
+            }
+
+            /* When user presses "Remove item" button */
+            if(callbackQuery.getData().startsWith("removeitem_"))
+            {
+                lastListTitle=callbackQuery.getData().replaceFirst("removeitem_", "");
+
+                if(listUser.getList(lastListTitle)!=null)
+                {
+                    status=ChatStatus.DELETE_ITEM;
+                    sendMessage("Type the item you want to remove from <b>"+lastListTitle+"</b>");
+                }
             }
         }
+    }
 
-        /* When user pressed "rename" button */
-        if(callbackQuery.getData().startsWith("rename_"))
+    /**
+     * Check if user is admin in the current chat
+     * @param userId the ID of the user
+     */
+    public boolean isUserAdmin(long userId)
+    {
+        GetChatMember g=new GetChatMember();
+        g.setChatId(this.listUser.getId());
+        g.setUserId(userId);
+
+        try
         {
-            lastListTitle=callbackQuery.getData().replaceFirst("rename_", "");
+            ChatMember c=(bot.execute(g));
 
-            if(listUser.getList(lastListTitle)!=null)
-            {
-                status=ChatStatus.RENAME_LIST;
-                sendMessage("✏️ Enter a new name for <b>"+lastListTitle+"</b>");
-            }
+            if(c.getStatus().equals("creator") || c.getStatus().equals("administrator"))
+                return true;
         }
-
-        /* When user presses "Add item" button */
-        if(callbackQuery.getData().startsWith("additems_"))
+        catch(TelegramApiException e)
         {
-            lastListTitle=callbackQuery.getData().replaceFirst("additems_", "");
-
-            if(listUser.getList(lastListTitle)!=null)
-            {
-                status=ChatStatus.ADD_ITEM;
-                sendMessage("Type the items you want to add to <b>"+lastListTitle+"</b>");
-            }
+            e.printStackTrace();
         }
-
-        /* When user presses "Remove item" button */
-        if(callbackQuery.getData().startsWith("removeitem_"))
-        {
-            lastListTitle=callbackQuery.getData().replaceFirst("removeitem_", "");
-
-            if(listUser.getList(lastListTitle)!=null)
-            {
-                status=ChatStatus.DELETE_ITEM;
-                sendMessage("Type the item you want to remove from <b>"+lastListTitle+"</b>");
-            }
-        }
+        return false;
     }
 
     /**
