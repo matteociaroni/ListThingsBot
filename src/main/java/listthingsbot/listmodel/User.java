@@ -1,5 +1,6 @@
 package listthingsbot.listmodel;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -8,7 +9,7 @@ import java.util.HashMap;
  *
  * @author Matteo Ciaroni
  */
-public class User
+public class User implements Serializable
 {
     /**
      * Unique id of the user

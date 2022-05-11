@@ -1,5 +1,6 @@
 package listthingsbot.listmodel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -7,7 +8,7 @@ import java.util.ArrayList;
  *
  * @author Matteo Ciaroni
  */
-public class List
+public class List implements Serializable
 {
     /**
      * The collection of strings

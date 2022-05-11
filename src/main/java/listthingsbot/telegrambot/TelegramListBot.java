@@ -1,10 +1,7 @@
 package listthingsbot.telegrambot;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -17,7 +14,7 @@ import java.util.List;
  *
  * @author Matteo Ciaroni
  */
-public class TelegramListBot extends TelegramLongPollingBot
+public class TelegramListBot extends TelegramLongPollingBot implements Serializable
 {
     /**
      * The HashMap object to manage the conversation between bot and user
@@ -36,7 +33,7 @@ public class TelegramListBot extends TelegramLongPollingBot
 
     public TelegramListBot(String token, String username)
     {
-        chats=new HashMap<>();
+        chats=loadChats();
         this.token=token;
         this.username=username;
     }
@@ -45,7 +42,7 @@ public class TelegramListBot extends TelegramLongPollingBot
      * This method manages updates from Telegram like new messages from users, buttons pressed...
      * Updates with messages and callback queries are passed to the onUpdate method of a Chat object
      *
-     * @param update    the object which contains all the information about the update
+     * @param update the object which contains all the information about the update
      */
     @Override
     public void onUpdateReceived(Update update)
@@ -66,13 +63,14 @@ public class TelegramListBot extends TelegramLongPollingBot
                 writeLog("New chat: "+chatId+"\tusername: "+update.getMessage().getChat().getUserName());
             }
             chats.get(chatId).onUpdate(update);
+            saveChats(chats);
         }
     }
 
     /**
      * This method appends a line to the log file
      *
-     * @param log   the string to append to the file
+     * @param log the string to append to the file
      */
     private void writeLog(String log)
     {
@@ -110,5 +108,35 @@ public class TelegramListBot extends TelegramLongPollingBot
     public String getBotToken()
     {
         return this.token;
+    }
+
+    public void saveChats(HashMap<String, Chat> chats)
+    {
+        try
+        {
+            ObjectOutputStream stream=new ObjectOutputStream(new FileOutputStream("Chats.bin"));
+            stream.writeObject(chats);
+            stream.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public HashMap<String, Chat> loadChats()
+    {
+        HashMap<String, Chat> result;
+        try
+        {
+            ObjectInputStream stream=new ObjectInputStream(new FileInputStream("Chats.bin"));
+            result=(HashMap<String, Chat>) stream.readObject();
+            stream.close();
+        }
+        catch(IOException | ClassNotFoundException e)
+        {
+            result=new HashMap<>();
+        }
+        return result;
     }
 }
