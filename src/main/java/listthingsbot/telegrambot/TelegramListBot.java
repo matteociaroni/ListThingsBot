@@ -31,17 +31,19 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
      */
     private final String username;
 
+    private static final String CHAT_FILE="Chats.bin";
+
     public TelegramListBot(String token, String username)
     {
         chats=loadChats();
         this.token=token;
         this.username=username;
+        Chat.bot=this;
     }
 
     /**
      * This method manages updates from Telegram like new messages from users, buttons pressed...
      * Updates with messages and callback queries are passed to the onUpdate method of a Chat object
-     *
      * @param update the object which contains all the information about the update
      */
     @Override
@@ -59,7 +61,7 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
 
             if(!chats.containsKey(chatId))
             {
-                chats.put(chatId, new Chat(chatId, this));
+                chats.put(chatId, new Chat(chatId));
                 writeLog("New chat: "+chatId+"\tusername: "+update.getMessage().getChat().getUserName());
             }
             chats.get(chatId).onUpdate(update);
@@ -69,7 +71,6 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
 
     /**
      * This method appends a line to the log file
-     *
      * @param log the string to append to the file
      */
     private void writeLog(String log)
@@ -110,11 +111,15 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
         return this.token;
     }
 
+    /**
+     * Serialize chats
+     * @param chats the collection with chats
+     */
     public void saveChats(HashMap<String, Chat> chats)
     {
         try
         {
-            ObjectOutputStream stream=new ObjectOutputStream(new FileOutputStream("Chats.bin"));
+            ObjectOutputStream stream=new ObjectOutputStream(new FileOutputStream(CHAT_FILE));
             stream.writeObject(chats);
             stream.close();
         }
@@ -124,12 +129,17 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
         }
     }
 
+
+    /**
+     * Deserialize chats
+     * @return all chats read from the file
+     */
     public HashMap<String, Chat> loadChats()
     {
         HashMap<String, Chat> result;
         try
         {
-            ObjectInputStream stream=new ObjectInputStream(new FileInputStream("Chats.bin"));
+            ObjectInputStream stream=new ObjectInputStream(new FileInputStream(CHAT_FILE));
             result=(HashMap<String, Chat>) stream.readObject();
             stream.close();
         }

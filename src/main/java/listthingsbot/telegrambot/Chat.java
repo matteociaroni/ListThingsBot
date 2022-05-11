@@ -32,7 +32,7 @@ public class Chat implements Serializable
     /**
      * The Telegram Bot object is used to execute actions like send and edit messages
      */
-    private final TelegramListBot bot;
+    protected static TelegramListBot bot;
 
     /**
      * Describes the current chat status.
@@ -46,10 +46,9 @@ public class Chat implements Serializable
      */
     private String lastListTitle;
 
-    public Chat(String chatId, TelegramListBot bot)
+    public Chat(String chatId)
     {
         listUser=new User(chatId);
-        this.bot=bot;
         status=ChatStatus.DEFAULT;
     }
 
@@ -144,7 +143,7 @@ public class Chat implements Serializable
             {
                 SendMessage sendMessage=new SendMessage();
                 sendMessage.setReplyMarkup(getButtonsWithListTitles("show_"));
-                sendMessage.setText("Select a list to show");
+                sendMessage.setText("Select the list to show ⬇️");
                 sendMessage(sendMessage);
             }
             else
