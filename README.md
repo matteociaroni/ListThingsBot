@@ -7,6 +7,3 @@ This Telegram bot helps users to manage lists. It supports private chats and gro
 - `/newlist`  creates a new list
 - `/cancel`   ignores current action
 - `/help`     shows the help message
-
-## Persistance
-Data persistance is not supported (yet).
