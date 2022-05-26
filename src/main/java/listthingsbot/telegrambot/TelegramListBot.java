@@ -75,16 +75,21 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
      */
     private void writeLog(String log)
     {
+        String logString=LocalDateTime.now()+"\t"+log+"\n";
+        System.out.println(logString);
+
+        /*
         String filename=Secrets.BOT_USERNAME+"-log.txt";
 
         try(BufferedWriter b=new BufferedWriter(new FileWriter(filename, true)))
         {
-            b.write(LocalDateTime.now()+"\t"+log+"\n");
+            b.write(logString);
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
+        */
     }
 
     @Override
