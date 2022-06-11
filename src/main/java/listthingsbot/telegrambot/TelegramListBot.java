@@ -31,6 +31,9 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
      */
     private final String username;
 
+    /**
+     * The name of the binary file to store all chats
+     */
     private static final String CHAT_FILE="Chats.bin";
 
     public TelegramListBot(String token, String username)
@@ -70,8 +73,8 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
     }
 
     /**
-     * This method appends a line to the log file
-     * @param log the string to append to the file
+     * Write a log line in the STDOUT
+     * @param log the string to append
      */
     private void writeLog(String log)
     {

@@ -70,7 +70,7 @@ public class User implements Serializable
     /**
      * @return a string listing all the lists
      */
-    public String getLists()
+    public String getListsTitles()
     {
         StringBuilder result=new StringBuilder();
 

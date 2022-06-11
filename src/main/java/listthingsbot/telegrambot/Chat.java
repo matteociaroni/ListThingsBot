@@ -73,7 +73,7 @@ public class Chat implements Serializable
         InlineKeyboardMarkup markupInline=new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline=new ArrayList<>();
 
-        for(String list : listUser.getLists().split("\n"))
+        for(String list : listUser.getListsTitles().split("\n"))
         {
             List<InlineKeyboardButton> rowInline=new ArrayList<>();
             InlineKeyboardButton inlineKeyboardButton=new InlineKeyboardButton();
