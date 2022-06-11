@@ -21,7 +21,16 @@ public class BotMain
         TelegramBotsApi api=new TelegramBotsApi(DefaultBotSession.class);
         try
         {
-            api.registerBot(new TelegramListBot(System.getenv("BOT_TOKEN"),System.getenv("BOT_USERNAME")));
+            String botToken=System.getenv("BOT_TOKEN");
+            String botUsername=System.getenv("BOT_USERNAME");
+
+            if(botToken == null || botUsername == null || botToken.isBlank() || botUsername.isBlank())
+            {
+                System.err.println("Token or username variable missing");
+                System.exit(-1);
+            }
+
+            api.registerBot(new TelegramListBot(botToken, botUsername));
         }
         catch(TelegramApiRequestException e)
         {
