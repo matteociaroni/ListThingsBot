@@ -111,11 +111,9 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
      */
     public void saveChats(HashMap<String, Chat> chats)
     {
-        try
+        try(ObjectOutputStream stream=new ObjectOutputStream(new FileOutputStream(CHAT_FILE)))
         {
-            ObjectOutputStream stream=new ObjectOutputStream(new FileOutputStream(CHAT_FILE));
             stream.writeObject(chats);
-            stream.close();
         }
         catch(IOException e)
         {
@@ -131,11 +129,9 @@ public class TelegramListBot extends TelegramLongPollingBot implements Serializa
     public HashMap<String, Chat> loadChats()
     {
         HashMap<String, Chat> result;
-        try
+        try(ObjectInputStream stream=new ObjectInputStream(new FileInputStream(CHAT_FILE)))
         {
-            ObjectInputStream stream=new ObjectInputStream(new FileInputStream(CHAT_FILE));
             result=(HashMap<String, Chat>) stream.readObject();
-            stream.close();
         }
         catch(IOException | ClassNotFoundException e)
         {
