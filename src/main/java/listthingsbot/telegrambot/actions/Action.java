@@ -10,7 +10,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 public abstract class Action
 {
+	/**
+	 * The chat used to execute the action
+	 */
 	protected Chat chat;
+
+	/**
+	 * If true, in group chats only admin che execute this Action
+	 */
 	protected boolean adminRequired = false;
 
 	public Action(Chat c)
@@ -156,5 +163,8 @@ public abstract class Action
 		}
 	}
 
+	/**
+	 * The main instructions of this Action
+	 */
 	public abstract void execute();
 }

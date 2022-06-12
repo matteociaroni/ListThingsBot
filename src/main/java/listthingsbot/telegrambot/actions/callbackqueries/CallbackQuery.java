@@ -6,24 +6,29 @@ import listthingsbot.telegrambot.actions.Action;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Every time the user send a valid Callback query from Telegram an instance of this class is executed
+ */
 public abstract class CallbackQuery extends Action
 {
-	protected Chat chat;
-	protected boolean adminRequired = false;
-
 	public CallbackQuery(Chat c)
 	{
 		super(c);
 	}
 
-	public static CallbackQuery getCallbackQuery(String commandName, Chat chat)
+	/**
+	 * This method is used to create the right CallbackQuery object based on a String
+	 *
+	 * @param value the value of the callback query provided by the user
+	 * @param chat  the chat where the callback query is invoked
+	 * @return the right CallbackQuery object based on the commandName string
+	 */
+	public static CallbackQuery getCallbackQuery(String value, Chat chat)
 	{
 		Map<String, CallbackQuery> commands = new HashMap<>();
 
 		//commands.put("/lists", new ListsCommand(chat));
 
-		return commands.get(commandName);
+		return commands.get(value);
 	}
-
-	public abstract void execute();
 }
