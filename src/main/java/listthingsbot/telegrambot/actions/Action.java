@@ -3,7 +3,6 @@ package listthingsbot.telegrambot.actions;
 import listthingsbot.telegrambot.Chat;
 import listthingsbot.telegrambot.ChatStatus;
 import listthingsbot.telegrambot.actions.commands.Command;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -33,48 +32,20 @@ public abstract class Action
 	 */
 	public static void elaborate(Chat chat, Message message)
 	{
-		/* When the user sends the "lists" command */
-		if(message.isCommand() && message.getText().startsWith("/lists"))
-			Command.getCommand("/lists", chat).execute();
-
-			/* Check if user is admin in a group or if it's a private chat */
-		else if(!message.isGroupMessage() || chat.isUserAdmin(message.getFrom().getId()))
+		/* When the user sends a Telegram command */
+		if(message.isCommand())
 		{
-			/* Messages containing Telegram Commands */
-			if(message.isCommand())
-				Command.getCommand(message.getText().trim(), chat).execute();
+			Command command = Command.getCommand(message.getText().trim(), chat);
 
-				/* Messages with no Telegram commands: instructions are based on the chat status */
-			else
-			{
-				/* When the user sends a message with the title of a new list */
-				if(chat.status == ChatStatus.ADD_LIST)
-					chat.addList(message.getText().trim());
+			if(!command.adminRequired || !message.isGroupMessage() || chat.isUserAdmin(message.getFrom().getId()))
+				command.execute();
+		}
 
-					/* When the user sends a message with the new title of a list to rename */
-				else if(chat.status == ChatStatus.RENAME_LIST)
-					chat.renameList(chat.lastListTitle, message.getText().trim());
-
-					/* When the user sends a message with a new item to add to a list */
-				else if(chat.status == ChatStatus.ADD_ITEM)
-					chat.addItems(chat.lastListTitle, message.getText().trim().split("\n"));
-
-					/* When the user sends a message with a new item to remove from a list */
-				else if(chat.status == ChatStatus.DELETE_ITEM)
-				{
-					try
-					{
-						chat.removeItem(chat.lastListTitle, Integer.parseInt(message.getText()));
-					}
-					catch(NumberFormatException e)
-					{
-						SendMessage sendMessage = new SendMessage();
-						sendMessage.setText("⚠️ Not a valid number");
-						chat.sendMessage(sendMessage);
-					}
-				}
-				chat.status = ChatStatus.DEFAULT;
-			}
+		/* Messages with no Telegram commands: instructions are based on the chat status */
+		else if(chat.status != ChatStatus.DEFAULT && (!message.isGroupMessage() || chat.isUserAdmin(message.getFrom().getId())))
+		{
+			chat.status.execute(chat, message.getText().trim());
+			chat.status = ChatStatus.DEFAULT;
 		}
 	}
 

@@ -198,14 +198,14 @@ public class Chat implements Serializable
 	 * @param listTitle the title list
 	 * @param items     all the items to add to the list
 	 */
-	public void addItems(String listTitle, String[] items)
+	public void addItems(String listTitle, String items)
 	{
 		status = ChatStatus.DEFAULT;
 		SendMessage sendMessage = new SendMessage();
 
 		if(listUser.getList(listTitle) != null)
 		{
-			for(String item : items)
+			for(String item : items.split("\n"))
 				listUser.getList(listTitle).addItem(item.trim());
 
 			sendMessage.setText("Item added to <b>" + listTitle + "</b> ✅");
