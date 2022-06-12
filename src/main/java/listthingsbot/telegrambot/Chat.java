@@ -5,8 +5,6 @@ import listthingsbot.telegrambot.actions.Action;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -61,9 +59,9 @@ public class Chat implements Serializable
     public void onUpdate(Update update)
     {
         if(update.hasMessage())
-            elaborate(update.getMessage());
+            Action.elaborate(this, update.getMessage());
         else if(update.hasCallbackQuery())
-            elaborate(update.getCallbackQuery());
+            Action.elaborate(this, update.getCallbackQuery());
     }
 
     /**
@@ -130,29 +128,6 @@ public class Chat implements Serializable
     }
 
     /**
-     * This method is called when the update received from Telegram has a message.
-     * It can send and edit messages.
-     *
-     * @param message the message which generated the update event
-     */
-    public void elaborate(Message message)
-    {
-        Action.elaborateMessage(this, message);
-    }
-
-
-    /**
-     * This method is called when the update received from Telegram has a callback query.
-     * This method can send and edit messages.
-     *
-     * @param callbackQuery the callback query which generated the update event
-     */
-    public void elaborate(CallbackQuery callbackQuery)
-    {
-        Action.elaborateCallbackQuery(this, callbackQuery);
-    }
-
-    /**
      * Check if user is admin in the current chat
      * @param userId the ID of the user
      */
@@ -164,7 +139,7 @@ public class Chat implements Serializable
 
         try
         {
-            ChatMember c=(bot.execute(g));
+            ChatMember c=bot.execute(g);
             return (c.getStatus().equals("creator") || c.getStatus().equals("administrator"));
         }
         catch(TelegramApiException e)

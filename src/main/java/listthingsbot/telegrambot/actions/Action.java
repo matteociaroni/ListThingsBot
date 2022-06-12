@@ -20,7 +20,13 @@ public abstract class Action
 
     public abstract void execute();
 
-    public static void elaborateMessage(Chat chat, Message message)
+    /**
+     * This method is called when the update received from Telegram has a message.
+     * It can send and edit messages.
+     *
+     * @param message the message which generated the update event
+     */
+    public static void elaborate(Chat chat, Message message)
     {
         /* When the user sends the "lists" command */
         if(message.isCommand() && message.getText().startsWith("/lists"))
@@ -40,15 +46,15 @@ public abstract class Action
                 if(chat.status==ChatStatus.ADD_LIST)
                     chat.addList(message.getText().trim());
 
-                    /* When the user sends a message with the new title of a list to rename */
+                /* When the user sends a message with the new title of a list to rename */
                 else if(chat.status==ChatStatus.RENAME_LIST)
                     chat.renameList(chat.lastListTitle, message.getText().trim());
 
-                    /* When the user sends a message with a new item to add to a list */
+                /* When the user sends a message with a new item to add to a list */
                 else if(chat.status==ChatStatus.ADD_ITEM)
                     chat.addItems(chat.lastListTitle, message.getText().trim().split("\n"));
 
-                    /* When the user sends a message with a new item to remove from a list */
+                /* When the user sends a message with a new item to remove from a list */
                 else if(chat.status==ChatStatus.DELETE_ITEM)
                 {
                     try
@@ -67,7 +73,13 @@ public abstract class Action
         }
     }
 
-    public static void elaborateCallbackQuery(Chat chat, CallbackQuery callbackQuery)
+    /**
+     * This method is called when the update received from Telegram has a callback query.
+     * This method can send and edit messages.
+     *
+     * @param callbackQuery the callback query which generated the update event
+     */
+    public static void elaborate(Chat chat, CallbackQuery callbackQuery)
     {
         /* When a user select a list to show */
         if(callbackQuery.getData().startsWith("show_"))
