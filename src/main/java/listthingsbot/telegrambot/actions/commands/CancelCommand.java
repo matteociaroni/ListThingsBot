@@ -5,16 +5,16 @@ import listthingsbot.telegrambot.ChatStatus;
 
 public class CancelCommand extends Command
 {
-    public CancelCommand(Chat c)
-    {
-        super(c);
-        super.adminRequired=true;
-    }
+	public CancelCommand(Chat c)
+	{
+		super(c);
+		super.adminRequired = true;
+	}
 
-    @Override
-    public void execute()
-    {
-        chat.status=ChatStatus.DEFAULT;
-        chat.sendMessage("Previous actions ignored");
-    }
+	@Override
+	public void execute()
+	{
+		chat.status = ChatStatus.DEFAULT;
+		chat.sendMessage("Previous actions ignored");
+	}
 }
