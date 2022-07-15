@@ -218,6 +218,10 @@ public class Chat implements Serializable
 			addItems.setText("➕ Add more items");
 			addItems.setCallbackData("additems_" + listTitle);
 			line1.add(addItems);
+			InlineKeyboardButton showList = new InlineKeyboardButton();
+			showList.setText("\uD83D\uDDD2 View list");
+			showList.setCallbackData("show_" + listTitle);
+			line1.add(showList);
 			rowsInline.add(line1);
 			markupInline.setKeyboard(rowsInline);
 			sendMessage.setReplyMarkup(markupInline);
@@ -241,6 +245,18 @@ public class Chat implements Serializable
 		{
 			listUser.getList(listTitle).removeItem(item);
 			sendMessage.setText("Item removed from <b>" + listTitle + "</b>");
+
+			/* Button to show the list */
+			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+			List<InlineKeyboardButton> line1 = new ArrayList<>();
+			InlineKeyboardButton showList = new InlineKeyboardButton();
+			showList.setText("\uD83D\uDDD2 View list");
+			showList.setCallbackData("show_" + listTitle);
+			line1.add(showList);
+			rowsInline.add(line1);
+			markupInline.setKeyboard(rowsInline);
+			sendMessage.setReplyMarkup(markupInline);
 		}
 		catch(NullPointerException e)
 		{
