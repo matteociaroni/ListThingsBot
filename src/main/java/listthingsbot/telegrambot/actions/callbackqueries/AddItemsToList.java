@@ -4,6 +4,11 @@ import listthingsbot.telegrambot.Chat;
 import listthingsbot.telegrambot.ChatStatus;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+/**
+ * An instance of this class is executed when the user press the "add items" button.
+ *
+ * @author Matteo Ciaroni
+ */
 public class AddItemsToList extends CallbackQuery
 {
 	public AddItemsToList(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -11,6 +16,9 @@ public class AddItemsToList extends CallbackQuery
 		super(c, telegramCallbackQuery);
 	}
 
+	/**
+	 * Send a message asking the user to write the item to add to the list.
+	 */
 	@Override
 	public void execute()
 	{

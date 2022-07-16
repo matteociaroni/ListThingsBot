@@ -3,6 +3,11 @@ package listthingsbot.telegrambot.actions.callbackqueries;
 import listthingsbot.telegrambot.Chat;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+/**
+ * An instance of this class is executed when the user press the "all lists" button.
+ *
+ * @author Matteo Ciaroni
+ */
 public class ShowLists extends CallbackQuery
 {
 	public ShowLists(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -10,6 +15,9 @@ public class ShowLists extends CallbackQuery
 		super(c, telegramCallbackQuery);
 	}
 
+	/**
+	 * Edit the message showing all user's lists.
+	 */
 	@Override
 	public void execute()
 	{

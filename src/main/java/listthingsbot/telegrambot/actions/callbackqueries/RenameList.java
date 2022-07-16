@@ -4,6 +4,11 @@ import listthingsbot.telegrambot.Chat;
 import listthingsbot.telegrambot.ChatStatus;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+/**
+ * An instance of this class is executed when the user press the "rename list" button.
+ *
+ * @author Matteo Ciaroni
+ */
 public class RenameList extends CallbackQuery
 {
 	public RenameList(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -12,6 +17,9 @@ public class RenameList extends CallbackQuery
 		super.adminRequired = true;
 	}
 
+	/**
+	 * Send a message asking the user to write the name of the new list.
+	 */
 	@Override
 	public void execute()
 	{

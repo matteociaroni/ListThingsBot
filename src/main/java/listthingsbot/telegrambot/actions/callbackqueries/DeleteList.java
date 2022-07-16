@@ -3,6 +3,11 @@ package listthingsbot.telegrambot.actions.callbackqueries;
 import listthingsbot.telegrambot.Chat;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+/**
+ * An instance of this class is executed when the user press the "delete list" button.
+ *
+ * @author Matteo Ciaroni
+ */
 public class DeleteList extends CallbackQuery
 {
 	public DeleteList(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -11,6 +16,9 @@ public class DeleteList extends CallbackQuery
 		super.adminRequired = true;
 	}
 
+	/**
+	 * Delete the list and edit the message.
+	 */
 	@Override
 	public void execute()
 	{

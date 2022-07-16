@@ -1,9 +1,13 @@
 package listthingsbot.telegrambot.actions.callbackqueries;
 
 import listthingsbot.telegrambot.Chat;
-import listthingsbot.telegrambot.ChatStatus;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+/**
+ * An instance of this class is executed when the user press the button to show a list.
+ *
+ * @author Matteo Ciaroni
+ */
 public class ShowList extends CallbackQuery
 {
 	public ShowList(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -11,6 +15,9 @@ public class ShowList extends CallbackQuery
 		super(c, telegramCallbackQuery);
 	}
 
+	/**
+	 * Edit the message showing list details and some buttons to manage it.
+	 */
 	@Override
 	public void execute()
 	{

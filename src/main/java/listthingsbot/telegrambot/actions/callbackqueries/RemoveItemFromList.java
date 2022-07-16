@@ -3,6 +3,11 @@ package listthingsbot.telegrambot.actions.callbackqueries;
 import listthingsbot.telegrambot.Chat;
 import listthingsbot.telegrambot.ChatStatus;
 
+/**
+ * An instance of this class is executed when the user press the "remove item" button.
+ *
+ * @author Matteo Ciaroni
+ */
 public class RemoveItemFromList extends CallbackQuery
 {
 	public RemoveItemFromList(Chat c, org.telegram.telegrambots.meta.api.objects.CallbackQuery telegramCallbackQuery)
@@ -10,6 +15,9 @@ public class RemoveItemFromList extends CallbackQuery
 		super(c, telegramCallbackQuery);
 	}
 
+	/**
+	 * Send a message asking the user to write the item to remove from the list.
+	 */
 	@Override
 	public void execute()
 	{
