@@ -1,7 +1,7 @@
 package listthingsbot.telegrambot.actions.commands;
 
 import listthingsbot.telegrambot.Chat;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import listthingsbot.telegrambot.buttons.Markup;
 
 /**
  * This class represents the /lists command.
@@ -21,12 +21,7 @@ public class ListsCommand extends Command
 	public void execute()
 	{
 		if(chat.listUser.countLists() > 0)
-		{
-			SendMessage sendMessage = new SendMessage();
-			sendMessage.setReplyMarkup(chat.getButtonsWithListTitles("show_"));
-			sendMessage.setText("Select the list to show ⬇️");
-			chat.sendMessage(sendMessage);
-		}
+			chat.sendMessage("Select the list to show ⬇️", Markup.selectList(chat.listUser));
 		else
 			chat.sendMessage("Nothing to show \uD83D\uDE41\nCreate a new list with /newlist");
 	}

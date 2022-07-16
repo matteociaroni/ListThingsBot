@@ -2,18 +2,16 @@ package listthingsbot.telegrambot;
 
 import listthingsbot.listmodel.User;
 import listthingsbot.telegrambot.actions.Action;
+import listthingsbot.telegrambot.buttons.Markup;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class controls the interaction between the Telegram user and the bot.
@@ -63,69 +61,6 @@ public class Chat implements Serializable
 	}
 
 	/**
-	 * @return the inline buttons containing all the list titles
-	 */
-	public InlineKeyboardMarkup getButtonsWithListTitles(String action)
-	{
-		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-
-		for(String list : listUser.getListsTitles().split("\n"))
-		{
-			List<InlineKeyboardButton> rowInline = new ArrayList<>();
-			InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-			inlineKeyboardButton.setText(list);
-			inlineKeyboardButton.setCallbackData(action + list);
-			rowInline.add(inlineKeyboardButton);
-			rowsInline.add(rowInline);
-		}
-		markupInline.setKeyboard(rowsInline);
-
-		return markupInline;
-	}
-
-	/**
-	 * @return the inline buttons containing all the list options ("add item", "remove item", "delete", "rename" and "all lists")
-	 */
-	public InlineKeyboardMarkup getButtonsWithListOptions(String listTitle)
-	{
-		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-		List<InlineKeyboardButton> line1 = new ArrayList<>();
-		List<InlineKeyboardButton> line2 = new ArrayList<>();
-		List<InlineKeyboardButton> line3 = new ArrayList<>();
-		InlineKeyboardButton addItems = new InlineKeyboardButton();
-		addItems.setText("➕ Add items");
-		addItems.setCallbackData("additems_" + listTitle);
-		InlineKeyboardButton removeItem = new InlineKeyboardButton();
-		removeItem.setText("➖ Remove item");
-		removeItem.setCallbackData("removeitem_" + listTitle);
-		InlineKeyboardButton deleteList = new InlineKeyboardButton();
-		deleteList.setText("\uD83D\uDDD1 Delete list");
-		deleteList.setCallbackData("delete_" + listTitle);
-		InlineKeyboardButton renameList = new InlineKeyboardButton();
-		renameList.setText("✏️ Rename list");
-		renameList.setCallbackData("rename_" + listTitle);
-		InlineKeyboardButton allLists = new InlineKeyboardButton();
-		allLists.setText("\uD83D\uDD19 All lists");
-		allLists.setCallbackData("lists");
-		line1.add(addItems);
-
-		if(listUser.getList(listTitle).size() > 0)
-			line1.add(removeItem);
-
-		line2.add(renameList);
-		line2.add(deleteList);
-		line3.add(allLists);
-		rowsInline.add(line1);
-		rowsInline.add(line2);
-		rowsInline.add(line3);
-		markupInline.setKeyboard(rowsInline);
-
-		return markupInline;
-	}
-
-	/**
 	 * Check if user is admin in the current chat
 	 *
 	 * @param userId the ID of the user
@@ -155,18 +90,13 @@ public class Chat implements Serializable
 	 */
 	public void addList(String listTitle)
 	{
-		SendMessage sendMessage = new SendMessage();
-
 		if(listUser.getList(listTitle) == null)
 		{
 			listUser.newList(listTitle);
-			sendMessage.setText("✅ New list <b>" + listTitle + "</b> created");
-			sendMessage.setReplyMarkup(getButtonsWithListOptions(listTitle));
+			sendMessage("✅ New list <b>" + listTitle + "</b> created", Markup.listOptions(listTitle, listUser.getList(listTitle).size()>0));
 		}
 		else
-			sendMessage.setText("⚠️ List " + listTitle + " <b>already exists</b>");
-
-		sendMessage(sendMessage);
+			sendMessage("⚠️ List " + listTitle + " <b>already exists</b>");
 	}
 
 	/**
@@ -178,29 +108,14 @@ public class Chat implements Serializable
 	public void renameList(String oldTitle, String newTitle)
 	{
 		status = ChatStatus.DEFAULT;
-		SendMessage sendMessage = new SendMessage();
 
 		if(listUser.getList(oldTitle) != null)
 		{
 			listUser.renameList(oldTitle, newTitle);
-			sendMessage.setText("List <b>" + oldTitle + "</b> renamed to <b>" + newTitle + "</b>");
-
-			/* Button to show the list */
-			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-			List<InlineKeyboardButton> line1 = new ArrayList<>();
-			InlineKeyboardButton showList = new InlineKeyboardButton();
-			showList.setText("\uD83D\uDDD2 Show list");
-			showList.setCallbackData("show_" + newTitle);
-			line1.add(showList);
-			rowsInline.add(line1);
-			markupInline.setKeyboard(rowsInline);
-			sendMessage.setReplyMarkup(markupInline);
+			sendMessage("List <b>" + oldTitle + "</b> renamed to <b>" + newTitle + "</b>", Markup.showList(newTitle));
 		}
 		else
-			sendMessage.setText("⚠️ List " + oldTitle + " <b>not found</b> \uD83D\uDE41");
-
-		sendMessage(sendMessage);
+			sendMessage("⚠️ List " + oldTitle + " <b>not found</b> \uD83D\uDE41");
 	}
 
 	/**
@@ -213,35 +128,16 @@ public class Chat implements Serializable
 	public void addItems(String listTitle, String items)
 	{
 		status = ChatStatus.DEFAULT;
-		SendMessage sendMessage = new SendMessage();
 
 		if(listUser.getList(listTitle) != null)
 		{
 			for(String item : items.split("\n"))
 				listUser.getList(listTitle).addItem(item.trim());
 
-			sendMessage.setText("Item added to <b>" + listTitle + "</b> ✅");
-
-			/* Buttons */
-			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-			List<InlineKeyboardButton> line1 = new ArrayList<>();
-			InlineKeyboardButton addItems = new InlineKeyboardButton();
-			addItems.setText("➕ Add more items");
-			addItems.setCallbackData("additems_" + listTitle);
-			line1.add(addItems);
-			InlineKeyboardButton showList = new InlineKeyboardButton();
-			showList.setText("\uD83D\uDDD2 Show list");
-			showList.setCallbackData("show_" + listTitle);
-			line1.add(showList);
-			rowsInline.add(line1);
-			markupInline.setKeyboard(rowsInline);
-			sendMessage.setReplyMarkup(markupInline);
+			sendMessage("Item added to <b>" + listTitle + "</b> ✅", Markup.addItemsOrShow(listTitle));
 		}
 		else
-			sendMessage.setText("⚠️ List " + listTitle + " <b>not found</b> \uD83D\uDE41");
-
-		sendMessage(sendMessage);
+			sendMessage("⚠️ List " + listTitle + " <b>not found</b> \uD83D\uDE41");
 	}
 
 	/**
@@ -252,29 +148,15 @@ public class Chat implements Serializable
 	 */
 	public void removeItem(String listTitle, int item)
 	{
-		SendMessage sendMessage = new SendMessage();
 		try
 		{
 			listUser.getList(listTitle).removeItem(item);
-			sendMessage.setText("Item removed from <b>" + listTitle + "</b>");
-
-			/* Button to show the list */
-			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-			List<InlineKeyboardButton> line1 = new ArrayList<>();
-			InlineKeyboardButton showList = new InlineKeyboardButton();
-			showList.setText("\uD83D\uDDD2 Show list");
-			showList.setCallbackData("show_" + listTitle);
-			line1.add(showList);
-			rowsInline.add(line1);
-			markupInline.setKeyboard(rowsInline);
-			sendMessage.setReplyMarkup(markupInline);
+			sendMessage("Item removed from <b>" + listTitle + "</b>", Markup.showList(listTitle));
 		}
 		catch(NullPointerException e)
 		{
-			sendMessage.setText("⚠️ List " + listTitle + " <b>not found</b> \uD83D\uDE41");
+			sendMessage("⚠️ List " + listTitle + " <b>not found</b> \uD83D\uDE41");
 		}
-		sendMessage(sendMessage);
 	}
 
 	/**
@@ -305,6 +187,20 @@ public class Chat implements Serializable
 	public void sendMessage(String text)
 	{
 		SendMessage message = new SendMessage();
+		message.setText(text);
+		sendMessage(message);
+	}
+
+	/**
+	 * This method is a short way to send a simple text message.
+	 *
+	 * @param text the string to send as a message
+	 * @param markup the markup containing buttons
+	 */
+	public void sendMessage(String text, InlineKeyboardMarkup markup)
+	{
+		SendMessage message = new SendMessage();
+		message.setReplyMarkup(markup);
 		message.setText(text);
 		sendMessage(message);
 	}

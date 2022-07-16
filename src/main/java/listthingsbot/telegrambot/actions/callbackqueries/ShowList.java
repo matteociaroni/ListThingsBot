@@ -1,6 +1,7 @@
 package listthingsbot.telegrambot.actions.callbackqueries;
 
 import listthingsbot.telegrambot.Chat;
+import listthingsbot.telegrambot.buttons.Markup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 /**
@@ -25,7 +26,7 @@ public class ShowList extends CallbackQuery
 		message.setMessageId(super.telegramCallbackQuery.getMessage().getMessageId());
 		chat.lastListTitle = super.telegramCallbackQuery.getData().replace("show_", "");
 		message.setText("\uD83D\uDDD2  <b>" + chat.lastListTitle + "</b>\n\n" + chat.listUser.getList(chat.lastListTitle).toString());
-		message.setReplyMarkup(chat.getButtonsWithListOptions(chat.lastListTitle));
+		message.setReplyMarkup(Markup.listOptions(chat.lastListTitle, chat.listUser.getList(chat.lastListTitle).size()>0));
 		chat.editMessage(message);
 	}
 }
