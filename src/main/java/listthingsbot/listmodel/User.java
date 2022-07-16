@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * This class describes a user
- * It provides different methods to manage lists
+ * This class describes a user.
+ * It provides different methods to manage user's lists
  *
  * @author Matteo Ciaroni
  */
@@ -77,7 +77,7 @@ public class User implements Serializable
 		StringBuilder result = new StringBuilder();
 
 		for(String title : lists.keySet())
-			result.append(title + "\n");
+			result.append(title).append("\n");
 
 		return result.toString();
 	}
