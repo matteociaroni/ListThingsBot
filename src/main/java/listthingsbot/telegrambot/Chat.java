@@ -184,6 +184,18 @@ public class Chat implements Serializable
 		{
 			listUser.renameList(oldTitle, newTitle);
 			sendMessage.setText("List <b>" + oldTitle + "</b> renamed to <b>" + newTitle + "</b>");
+
+			/* Button to show the list */
+			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+			List<InlineKeyboardButton> line1 = new ArrayList<>();
+			InlineKeyboardButton showList = new InlineKeyboardButton();
+			showList.setText("\uD83D\uDDD2 Show list");
+			showList.setCallbackData("show_" + newTitle);
+			line1.add(showList);
+			rowsInline.add(line1);
+			markupInline.setKeyboard(rowsInline);
+			sendMessage.setReplyMarkup(markupInline);
 		}
 		else
 			sendMessage.setText("⚠️ List " + oldTitle + " <b>not found</b> \uD83D\uDE41");
@@ -210,7 +222,7 @@ public class Chat implements Serializable
 
 			sendMessage.setText("Item added to <b>" + listTitle + "</b> ✅");
 
-			/* Button to add another item */
+			/* Buttons */
 			InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
 			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 			List<InlineKeyboardButton> line1 = new ArrayList<>();
@@ -219,7 +231,7 @@ public class Chat implements Serializable
 			addItems.setCallbackData("additems_" + listTitle);
 			line1.add(addItems);
 			InlineKeyboardButton showList = new InlineKeyboardButton();
-			showList.setText("\uD83D\uDDD2 View list");
+			showList.setText("\uD83D\uDDD2 Show list");
 			showList.setCallbackData("show_" + listTitle);
 			line1.add(showList);
 			rowsInline.add(line1);
@@ -251,7 +263,7 @@ public class Chat implements Serializable
 			List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 			List<InlineKeyboardButton> line1 = new ArrayList<>();
 			InlineKeyboardButton showList = new InlineKeyboardButton();
-			showList.setText("\uD83D\uDDD2 View list");
+			showList.setText("\uD83D\uDDD2 Show list");
 			showList.setCallbackData("show_" + listTitle);
 			line1.add(showList);
 			rowsInline.add(line1);
