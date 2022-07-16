@@ -92,7 +92,7 @@ public class List implements Serializable
 			result.append("(empty list)");
 		else
 			for(String item : content)
-				result.append(++count + ". " + item + "\n");
+				result.append(++count).append(". ").append(item).append("\n");
 
 		return result.toString();
 	}
