@@ -1,14 +1,13 @@
 package listthingsbot.telegrambot.actions.commands;
 
-
 import listthingsbot.telegrambot.Chat;
 import listthingsbot.telegrambot.ChatStatus;
 
 /**
- * This class represents the /help command.
- * This command sends a message to the user with some information about the bot and its commands.
+ * This class represents the /start command.
+ * This command sends a message to the user with some basic information about the bot.
  *
- * @author Matteo Ciaroni
+ * @author Matteo Baldaccioni
  */
 public class StartCommand extends Command
 {
