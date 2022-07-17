@@ -29,6 +29,7 @@ public abstract class Command extends Action
 
 		commands.put("/lists", new ListsCommand(chat));
 		commands.put("/help", new HelpCommand(chat));
+		commands.put("/start", new StartCommand(chat));
 		commands.put("/cancel", new CancelCommand(chat));
 		commands.put("/newlist", new NewListCommand(chat));
 
